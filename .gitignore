@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# venv for this project
+dezero_kimito/
+
+# editor settings
+.vscode/
