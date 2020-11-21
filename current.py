@@ -4,35 +4,34 @@ if '__file__' in globals():
 
 import numpy as np
 import unittest
-from dezero import Variable, Function
+from dezero import Variable
+
+# class Square(Function):
+#     def forward(self, x):
+#         y = np.power(x, 2)
+#         return y
+
+#     def backward(self, gy):
+#         x = self.inputs[0].data
+#         gx = 2 * x * gy
+#         return gx
+
+# def square(x):
+#     return Square()(x)
 
 
-class Square(Function):
-    def forward(self, x):
-        y = np.power(x, 2)
-        return y
-
-    def backward(self, gy):
-        x = self.inputs[0].data
-        gx = 2 * x * gy
-        return gx
-
-def square(x):
-    return Square()(x)
-
-
-class Exp(Function):
-    def forward(self, x):
-        y = np.exp(x)
-        return y
+# class Exp(Function):
+#     def forward(self, x):
+#         y = np.exp(x)
+#         return y
     
-    def backward(self, gy):
-        x = self.inputs[0].data
-        gx = np.exp(x) * gy
-        return gx
+#     def backward(self, gy):
+#         x = self.inputs[0].data
+#         gx = np.exp(x) * gy
+#         return gx
 
-def exp(x):
-    return Exp()(x)
+# def exp(x):
+#     return Exp()(x)
 
 def numerical_diff(f, x, eps=1e-4):
     x0 = Variable(x.data - eps)
@@ -67,11 +66,15 @@ class SquareTest(unittest.TestCase):
 if __name__ == '__main__':
     # unittest.main()
 
-    x = Variable(np.array(3.0))
+    def goldstein(x, y):
+        z = (1 + (x + y + 1) ** 2 * (19 - 14 * x + 3 * x ** 2 - 14 * y + 6 * x * y + 3 * y ** 2))  * \
+            (30 + (2 * x - 3 * y) ** 2 * (18 - 32 * x + 12 * x ** 2 + 48 * y - 36 * x * y + 27 * y ** 2))
+        return z
 
-    y = x ** 2
+    x = Variable(np.array(1.0))
+    y = Variable(np.array(1.0))
 
-    print(y)
+    z = goldstein(x, y)
+    z.backward()
 
-    y.backward()
-    print(x.grad)
+    print(x.grad, y.grad)
