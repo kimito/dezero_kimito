@@ -102,17 +102,6 @@ def numerical_diff(f, x, eps=1e-4):
     y1 = f(x1)
     return (y1.data - y0.data)/(2 * eps)
 
-if __name__ == '__main__':
-    x = Variable(np.array(2.0))
-    y = Variable(np.array(3.0))
-    z = add(square(x), square(y))
-
-    z.backward()
-
-    print(z.data)
-    print(x.grad)
-    print(y.grad)
-
 class SquareTest(unittest.TestCase):
     def test_forward(self):
         x = Variable(np.array(2.0))
@@ -134,3 +123,18 @@ class SquareTest(unittest.TestCase):
         num_grad = numerical_diff(square, x)
         flg = np.allclose(x.grad, num_grad)
         self.assertTrue(flg)
+
+
+if __name__ == '__main__':
+    # unittest.main()
+
+    x = Variable(np.array(2.0))
+    y = Variable(np.array(3.0))
+    z = add(square(x), square(y))
+
+    z.backward()
+
+    print(z.data)
+    print(x.grad)
+    print(y.grad)
+
