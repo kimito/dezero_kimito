@@ -8,12 +8,22 @@ def as_array(x):
         return np.array(x)
     return x
 
+def as_variable(obj):
+    if isinstance(obj, Variable):
+        return obj
+    return Variable(obj)
+
+def as_tuple(obj):
+    if isinstance(obj, tuple):
+        return obj
+    return (obj,)
+
 class Function:
     def __call__(self, *inputs):
+        inputs = [as_variable(as_array(x)) for x in inputs]
+
         xs = [x.data for x in inputs]
-        ys = self.forward(*xs)
-        if not isinstance(ys, tuple):
-            ys = (ys,)
+        ys = as_tuple(self.forward(*xs))
         outputs = [Variable(as_array(y)) for y in ys]
 
         if Config.enable_backprop:
@@ -98,6 +108,7 @@ def mul(x0, x1):
     return Mul()(x0, x1)
 
 class Variable:
+    __array_priority__ = 200
     def __init__(self, data, name=None):
         if (data is not None) and (not isinstance(data, np.ndarray)):
                 raise TypeError('{} is not supported'.format(type(data)))
@@ -130,9 +141,7 @@ class Variable:
         while funcs:
             f = funcs.pop()
             gys = [output().grad for output in f.outputs]
-            gxs = f.backward(*gys)
-            if not isinstance(gxs, tuple):
-                gxs = (gxs,)
+            gxs = as_tuple(f.backward(*gys))
 
             for x, gx in zip(f.inputs, gxs):
                 if x.grad is None:
@@ -171,8 +180,10 @@ class Variable:
         p = str(self.data).replace('\n', '\n' + ' ' * 9)
         return 'variable(' + p + ')'
 
-Variable.__mul__ = mul
 Variable.__add__ = add
+Variable.__radd__ = add
+Variable.__mul__ = mul
+Variable.__rmul__ = mul
 
 def numerical_diff(f, x, eps=1e-4):
     x0 = Variable(x.data - eps)
@@ -207,17 +218,12 @@ class SquareTest(unittest.TestCase):
 if __name__ == '__main__':
     # unittest.main()
 
-    a = Variable(np.array(3.0))
-    b = Variable(np.array(2.0))
-    c = Variable(np.array(1.0))
+    x = Variable(np.array(2.0))
 
-    y = a * b + c
-
-    y.backward()
+    y = np.array([2.0]) * x
 
     print(y)
-    print(a.grad)
-    print(b.grad)
-    print(c.grad)
 
+    y.backward()
+    print(x.grad)
 
