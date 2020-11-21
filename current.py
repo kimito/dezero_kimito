@@ -64,6 +64,7 @@ def numerical_diff(f, x, eps=1e-4):
 
 
 if __name__ == '__main__':
+    from dezero.utils import plot_dot_graph
     # unittest.main()
 
     def goldstein(x, y):
@@ -71,10 +72,11 @@ if __name__ == '__main__':
             (30 + (2 * x - 3 * y) ** 2 * (18 - 32 * x + 12 * x ** 2 + 48 * y - 36 * x * y + 27 * y ** 2))
         return z
 
-    x = Variable(np.array(1.0))
-    y = Variable(np.array(1.0))
+    x = Variable(np.array(1.0), "x")
+    y = Variable(np.array(1.0), "y")
 
     z = goldstein(x, y)
     z.backward()
+    z.name = 'z'
 
-    print(x.grad, y.grad)
+    plot_dot_graph(z, verbose=False, to_file='goldstein.png')
