@@ -133,3 +133,5 @@ dezero_kimito/
 
 # editor settings
 .vscode/
+
+*.png
