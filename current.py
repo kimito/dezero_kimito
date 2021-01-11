@@ -3,8 +3,9 @@ if '__file__' in globals():
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import numpy as np
+import math
 import unittest
-from dezero import Variable
+from dezero import Variable, Function
 
 # class Square(Function):
 #     def forward(self, x):
@@ -32,6 +33,30 @@ from dezero import Variable
 
 # def exp(x):
 #     return Exp()(x)
+
+class Sin(Function):
+    def forward(self, x):
+        y = np.sin(x)
+        return y
+
+    def backward(self, gy):
+        x = self.inputs[0].data
+        gx = gy * np.cos(x)
+        return gx
+
+def sin(x):
+    return Sin()(x)
+
+def my_sin(x, threshold=0.0001):
+    y = 0
+    for i in range(100000):
+        c = (-1) ** i / math.factorial(2 * i + 1)
+        t = c * x ** (2 * i + 1)
+        y = y + t
+        if abs(t.data) < threshold:
+            break
+    return y
+
 
 def numerical_diff(f, x, eps=1e-4):
     x0 = Variable(x.data - eps)
@@ -64,19 +89,12 @@ def numerical_diff(f, x, eps=1e-4):
 
 
 if __name__ == '__main__':
-    from dezero.utils import plot_dot_graph
     # unittest.main()
 
-    def goldstein(x, y):
-        z = (1 + (x + y + 1) ** 2 * (19 - 14 * x + 3 * x ** 2 - 14 * y + 6 * x * y + 3 * y ** 2))  * \
-            (30 + (2 * x - 3 * y) ** 2 * (18 - 32 * x + 12 * x ** 2 + 48 * y - 36 * x * y + 27 * y ** 2))
-        return z
+    x = Variable(np.array(np.pi/4))
+    # x = Variable(np.array(0))
+    y = my_sin(x)
+    y.backward()
 
-    x = Variable(np.array(1.0), "x")
-    y = Variable(np.array(1.0), "y")
-
-    z = goldstein(x, y)
-    z.backward()
-    z.name = 'z'
-
-    plot_dot_graph(z, verbose=False, to_file='goldstein.png')
+    print(y.data)
+    print(x.grad)
