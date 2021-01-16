@@ -174,7 +174,7 @@ class Variable:
             gys = [output().grad for output in f.outputs]
 
             with using_config('enable_backprop', create_graph):
-                gxs = f.forward(*gys)
+                gxs = f.backward(*gys)
                 gxs = as_tuple(f.backward(*gys))
 
                 for x, gx in zip(f.inputs, gxs):
