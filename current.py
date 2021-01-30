@@ -7,18 +7,8 @@ from dezero import Variable
 import dezero.functions as F
 import dezero.utils as P
 
-x = Variable(np.array(1.0))
-x.name = 'x'
-y = F.sin(x)
-y.name = 'y'
-y.backward(create_graph=True)
-
-for i in range(3):
-    gx = x.grad
-    x.grad.name = "gx" + str(i)
-    x.cleargrad()
-    gx.backward(create_graph=True)
-    print(x.grad)
-
-    if i == 2:
-        P.plot_dot_graph(x.grad)
+x = Variable(np.array([[1, 2, 3],[4, 5, 6]]))
+y = x.transpose()
+print(y)
+y.backward()
+print(x.grad)
