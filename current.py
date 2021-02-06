@@ -7,8 +7,10 @@ from dezero import Variable
 import dezero.functions as F
 import dezero.utils as P
 
-x = Variable(np.array([[1, 2, 3],[4, 5, 6]]))
-y = x.transpose()
+x0 = Variable(np.array([1, 2, 3]))
+x1 = Variable(np.array([10]))
+y = x0 + x1
 print(y)
+
 y.backward()
-print(x.grad)
+print(x1.grad)
