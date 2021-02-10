@@ -7,10 +7,29 @@ from dezero import Variable
 import dezero.functions as F
 import dezero.utils as P
 
-x = Variable(np.random.randn(2, 3))
-W = Variable(np.random.randn(3, 4))
-y = F.matmul(x, W)
-y.backward()
+def predict(x):
+    y = F.matmul(x, W) + b
+    return y
 
-print(x.grad.shape)
-print(W.grad.shape)
+np.random.seed(0)
+x = np.random.rand(100, 1)
+y = 5 + 2 * x + np.random.rand(100, 1)
+x, y = Variable(x), Variable(y)
+
+W = Variable(np.zeros((1, 1)))
+b = Variable(np.zeros(1))
+
+lr = 0.1
+iters = 100
+
+for i in range(iters):
+    y_pred = predict(x)
+    loss = F.mean_squared_error(y, y_pred)
+
+    W.cleargrad()
+    b.cleargrad()
+    loss.backward()
+
+    W.data -= lr * W.grad.data
+    b.data -= lr * b.grad.data
+    print(W, b, loss)
