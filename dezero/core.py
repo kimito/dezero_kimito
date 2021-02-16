@@ -253,6 +253,9 @@ class Variable:
     def sum(self, axis=None, keepdims=False):
         return dezero.functions.sum(self, axis, keepdims)
 
+class Parameter(Variable):
+    pass
+
 def setup_variable():
     Variable.__add__ = add
     Variable.__radd__ = add
