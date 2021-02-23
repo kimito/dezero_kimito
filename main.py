@@ -3,35 +3,30 @@ if '__file__' in globals():
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import numpy as np
-from dezero import Variable
+from dezero import Variable, as_variable
 from dezero import optimizers
 import dezero.functions as F
 from dezero.models import MLP
 
-np.random.seed(0)
-x = np.random.rand(100, 1)
-y = np.sin(2 * np.pi * x) + np.random.rand(100, 1)
+def softmax1d(x):
+    x = as_variable(x)
+    y = F.exp(x)
+    sum_y = F.sum(y)
+    return y / sum_y
 
-lr = 0.2
-iters = 10000
-hidden_size = 10
+model = MLP((10, 3))
 
-model = MLP((hidden_size, 1))
-optimizer = optimizers.MomentumSGD(lr).setup(model)
+# x = np.array([[0.2, -0.4]])
+# y = model(x)
+# p = F.softmax_simple(y)
+# print(y)
+# print(p)
+# print(F.sum(p))
 
-for i in range(iters):
-    y_pred = model(x)
-    loss = F.mean_squared_error(y, y_pred)
+x = np.array([[0.2, -0.4], [0.3, 0.5], [1.3, -3.2], [2.1, 0.3]])
+t = np.array([2, 0, 1, 0])
+y = model(x)
 
-    model.cleargrads()
-    loss.backward()
+loss = F.softmax_cross_entropy_simple(y, t)
 
-    optimizer.update()
-
-    if i % 1000 == 0:
-        print(loss)
-
-print(model.forward(np.array([0.1])))
-print(model.forward(np.array([0.3])))
-print(model.forward(np.array([0.5])))
-print(model.forward(np.array([0.7])))
+print(loss)
