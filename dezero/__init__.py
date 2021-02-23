@@ -20,4 +20,6 @@ else:
     from dezero.core import setup_variable
     from dezero.models import Model
 
+    import dezero.datasets
+
 setup_variable()
